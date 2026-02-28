@@ -1,1 +1,66 @@
-<p>inicio works!</p>
+<h1 class="text-3xl font-bold underline">Hello world!</h1>
+<!-- @if (velas.hasValue()) {
+  <pre>
+
+    {{ velas.value() }}
+  </pre>
+} @else if (velas.error()) {
+  <div>Could not load velas information</div>
+} @else if (velas.isLoading()) {
+  <div>Loading velas info...</div>
+} -->
+
+<!-- <pre>
+
+  {{ velas | async | json }}
+</pre>
+{{ velas[0] }} -->
+
+<ul>
+  @for (item of velas | async; track $index) {
+    <li>
+      <!-- <p>{{ $index }}</p> -->
+      <pre>
+        {{ item | json }}
+      <!-- {{ item[0] }}  fecha
+      {{ item[1] }}  abrio
+      {{ item[2] }}  maximo
+      {{ item[3] }}  minimo
+      {{ item[4] }}  close
+      {{ item[5] }}  volumen
+      {{ item[6] }}  fecha de cierre
+      {{ item[7] ?? '7' }}  
+      {{ item[8] ?? '8' }}  
+      {{ item[9] ?? '9' }}  
+      {{ item[10] ?? '10' }}  
+      {{ item[11] ?? '11' }}   -->
+    </pre>
+    </li>
+  }
+</ul>
+
+<!-- time: timestamp,
+     open: number,
+     high: number,
+     low: number,
+     close: number,
+     volume: number -->
+
+<!-- time: k[0] / 1000, // Convertir a segundos
+      open: parseFloat(k[1]),
+      high: parseFloat(k[2]),
+      low: parseFloat(k[3]),
+      close: parseFloat(k[4]),
+      volume: parseFloat(k[5]) -->
+
+<!-- CREATE TABLE candle_cache (
+  symbol VARCHAR(20),
+  interval VARCHAR(10),
+  open_time BIGINT,
+  open DECIMAL(18,8),
+  high DECIMAL(18,8),
+  low DECIMAL(18,8),
+  close DECIMAL(18,8),
+  volume DECIMAL(18,8),
+  PRIMARY KEY (symbol, interval, open_time)
+); -->
