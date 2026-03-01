@@ -21,12 +21,13 @@ interface Vela {
 })
 export class Inicio {
   #http = inject(HttpClient);
+
   // velas = rxResource({ stream })
-  // velas = httpResource<any[]>(
+  // velasDos = httpResource<any[]>(
   //   () => 'https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=10',
   // );
 
-  velas = this.#http
+  velas$ = this.#http
     .get<any[]>('https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1d&limit=10')
     // .pipe(map((val) => val[0]));
     .pipe(

@@ -1,4 +1,4 @@
-<h1 class="text-3xl font-bold underline">Hello world!</h1>
+<h1 class="text-3xl font-bold ml-10">Hello world!</h1>
 <!-- npm install lightweight-charts -->
 <!-- ng add ng2-charts -->
 <!-- @if (velas.hasValue()) {
@@ -19,7 +19,7 @@
 {{ velas[0] }} -->
 
 <ul>
-  @for (item of velas | async; track $index) {
+  @for (item of velas$ | async; track $index) {
     <li>
       <!-- <p>{{ $index }}</p> -->
       <pre>
