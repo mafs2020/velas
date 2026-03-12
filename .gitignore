@@ -45,3 +45,5 @@ Thumbs.db
 
 
 .env
+.pnpm-lock.yaml
+pnpm-lock.yaml
