@@ -1,4 +1,12 @@
 <h1 class="text-3xl font-bold ml-10">Hello world!</h1>
+
+{{ sub | async }}
+{{ otro | async | json }}
+
+{{ '='.repeat(50) }}
+{{ nuevo | async | json }}
+<div #chart></div>
+<div #chart2></div>
 <!-- npm install lightweight-charts -->
 <!-- ng add ng2-charts -->
 <!-- @if (velas.hasValue()) {
@@ -17,29 +25,6 @@
   {{ velas | async | json }}
 </pre>
 {{ velas[0] }} -->
-
-<ul>
-  @for (item of velas$ | async; track $index) {
-    <li>
-      <!-- <p>{{ $index }}</p> -->
-      <pre>
-        {{ item | json }}
-      <!-- {{ item[0] }}  fecha
-      {{ item[1] }}  abrio
-      {{ item[2] }}  maximo
-      {{ item[3] }}  minimo
-      {{ item[4] }}  close
-      {{ item[5] }}  volumen
-      {{ item[6] }}  fecha de cierre
-      {{ item[7] ?? '7' }}  
-      {{ item[8] ?? '8' }}  
-      {{ item[9] ?? '9' }}  
-      {{ item[10] ?? '10' }}  
-      {{ item[11] ?? '11' }}   -->
-    </pre>
-    </li>
-  }
-</ul>
 
 <!-- time: timestamp,
      open: number,
