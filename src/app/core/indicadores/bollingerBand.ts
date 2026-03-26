@@ -3,17 +3,25 @@
 // Upper = SMA + (stdDev * multiplier)
 // Lower = SMA - (stdDev * multiplier)
 
-export interface BollingerBand {
-  time: number;
-  middle: number;
-  upper: number;
-  lower: number;
-}
-
 import { Candle } from '../inicio/servicios/prueba';
 
-export function calculateBollinger(candles: Candle[], period = 20, multiplier = 2): any[] {
-  const result: BollingerBand[] = [];
+type BollingerResult = {
+  upper: Point[];
+  middle: Point[];
+  lower: Point[];
+};
+
+type Point = {
+  time: number;
+  value: number;
+};
+
+export function calculateBollinger(
+  candles: Candle[],
+  period = 20,
+  multiplier = 2,
+): BollingerResult {
+  const data: BollingerResult = { upper: [], middle: [], lower: [] };
 
   for (let i = period; i < candles.length; i++) {
     const slice = candles.slice(i - period, i);
@@ -26,13 +34,14 @@ export function calculateBollinger(candles: Candle[], period = 20, multiplier = 
 
     const stdDev = Math.sqrt(variance);
 
-    result.push({
-      time: candles[i].time,
-      middle: mean,
-      upper: mean + stdDev * multiplier,
-      lower: mean - stdDev * multiplier,
-    });
+    const time = candles[i].time;
+    const upper = mean + stdDev * multiplier;
+    const lower = mean - stdDev * multiplier;
+
+    data.upper.push({ time, value: upper });
+    data.middle.push({ time, value: mean });
+    data.lower.push({ time, value: lower });
   }
 
-  return result;
+  return data;
 }
