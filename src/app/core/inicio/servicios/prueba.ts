@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, Subject, tap } from 'rxjs';
+import { currency, timeframe } from '../../interfaces';
 
 export interface Candle {
   time: number;
@@ -9,6 +10,7 @@ export interface Candle {
   low: number;
   close: number;
   volume: number;
+  medio: number;
 }
 
 @Injectable({
@@ -36,6 +38,7 @@ export class BinanceService {
         low: +k.l,
         close: +k.c,
         volume: +k.v,
+        medio: (+k.h + +k.l) / 2,
       });
     };
 
@@ -44,7 +47,7 @@ export class BinanceService {
 
   getHistorical(symbol: string, interval: string): Observable<Candle[]> {
     // https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=1h&limit=10
-    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=${interval}&limit=10`;
+    const url = `https://api.binance.com/api/v3/klines?symbol=${symbol.toUpperCase()}&interval=${interval}&limit=300`;
     return this.#http.get<Candle[]>(url).pipe(
       map<any[], Candle[]>((data: number[]) => this.structureData(data)),
       tap((candles) => console.log('Historical candles :>> ', candles)),
@@ -63,6 +66,7 @@ export class BinanceService {
       low: +d[3],
       close: +d[4],
       volume: +d[5],
+      medio: (+d[2] + +d[3]) / 2,
     }));
   }
 }

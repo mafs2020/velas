@@ -11,7 +11,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-import { AsyncPipe, JsonPipe } from '@angular/common';
+import { AsyncPipe, JsonPipe, NgClass } from '@angular/common';
 import { map, Observable, tap } from 'rxjs';
 
 import {
@@ -42,7 +42,7 @@ import { currency, timeframe } from '../interfaces';
 
 @Component({
   selector: 'app-inicio',
-  imports: [AsyncPipe, FormsModule],
+  imports: [AsyncPipe, FormsModule, NgClass],
   // imports: [AsyncPipe, JsonPipe, FormField],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
@@ -50,7 +50,7 @@ import { currency, timeframe } from '../interfaces';
 })
 export class Inicio implements AfterViewInit, OnDestroy {
   // fecha = Temporal.now();
-  time = signal<string>('1m');
+  time = signal<string>('1h');
   currency = signal<string>('btcusdt');
   binance = inject(BinanceService);
   @ViewChild('chart') chartEl!: ElementRef;
@@ -160,8 +160,8 @@ export class Inicio implements AfterViewInit, OnDestroy {
               price: v.medio, // Coordenada y exacta
               // ------------------------------------------
               // color: '#49d7d7',
-              // shape: 'circle',
-              // size: 1,
+              shape: 'circle',
+              size: 1,
             })) as any,
           );
         })
@@ -247,12 +247,13 @@ export class Inicio implements AfterViewInit, OnDestroy {
       borderVisible: false,
     });
 
-    this.ema3 = this.chart.addSeries(LineSeries, { color: '#ff0000', lineWidth: 2 });
-    this.ema9 = this.chart.addSeries(LineSeries, { color: '#ff9900', lineWidth: 2, lineStyle: 3 });
-    this.ema20 = this.chart.addSeries(LineSeries, { color: '#00ffff', lineWidth: 2 });
-    this.ema50 = this.chart.addSeries(LineSeries, { color: '#00ff00', lineWidth: 2 });
-    this.ema200 = this.chart.addSeries(LineSeries, { color: '#eb5d5d', lineWidth: 2 });
-    this.medio = this.chart.addSeries(LineSeries, { color: '#8888ff', lineWidth: 2 });
+    this.ema3 = this.chart.addSeries(LineSeries, { color: '#2f76aa', lineWidth: 2 });
+    this.ema9 = this.chart.addSeries(LineSeries, { color: '#3b9a33', lineWidth: 2, lineStyle: 3 });
+    this.ema20 = this.chart.addSeries(LineSeries, { color: '#3b9a33', lineWidth: 2 });
+    this.ema50 = this.chart.addSeries(LineSeries, { color: '#f37523', lineWidth: 2 });
+    this.ema200 = this.chart.addSeries(LineSeries, { color: '#d71526', lineWidth: 2 });
+    this.medio = this.chart.addSeries(LineSeries, { color: '#a5ecb8', lineWidth: 2 });
+    // this.medio = this.chart.addSeries(LineSeries, { color: '#8888ff', lineWidth: 2 });
 
     this.areaSeries = this.chart.addSeries(AreaSeries, {
       lastValueVisible: false, // hide the last value marker for this series
@@ -269,9 +270,11 @@ export class Inicio implements AfterViewInit, OnDestroy {
       bottomColor: '#eb5d5d10',
     });
 
-    this.bbUpper = this.chart.addSeries(LineSeries, { color: '#8888ff', lineWidth: 2 });
-    this.bbMiddle = this.chart.addSeries(LineSeries, { color: '#ffffff', lineWidth: 1 });
-    this.bbLower = this.chart.addSeries(LineSeries, { color: '#8888ff', lineWidth: 2 });
+    this.bbUpper = this.chart.addSeries(LineSeries, { color: '#138484', lineWidth: 2 });
+    // this.bbUpper = this.chart.addSeries(LineSeries, { color: '#8888ff', lineWidth: 2 });
+    this.bbMiddle = this.chart.addSeries(LineSeries, { color: '#872323', lineWidth: 1 });
+    this.bbLower = this.chart.addSeries(LineSeries, { color: '#138484', lineWidth: 2 });
+    // this.bbLower = this.chart.addSeries(LineSeries, { color: '#8888ff', lineWidth: 2 });
 
     // this.macdLine = this.chart.addSeries(LineSeries);
     // this.signalLine = this.chart.addSeries(LineSeries);
@@ -285,5 +288,10 @@ export class Inicio implements AfterViewInit, OnDestroy {
   ngOnDestroy() {
     this.chart.remove();
     this.binance.disconnect();
+  }
+
+  gg(t: string) {
+    console.log(t);
+    this.time.set(t);
   }
 }

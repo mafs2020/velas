@@ -1,0 +1,21 @@
+.container--botones {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 90%;
+  margin: 1rem auto;
+
+  > * {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: rgb(61, 56, 54);
+    color: white;
+  }
+}
+
+.selected {
+  background-color: #d2513b;
+  color: white;
+}
