@@ -2,6 +2,7 @@ import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http'
 import { inject, Injectable } from '@angular/core';
 import { map, Observable, Subject, tap } from 'rxjs';
 import { currency, timeframe } from '../../interfaces';
+import { LineData, Time, UTCTimestamp, WhitespaceData } from 'lightweight-charts';
 
 export interface Candle {
   time: number;
@@ -29,10 +30,11 @@ export class BinanceService {
 
     this.socket.onmessage = (msg) => {
       const data = JSON.parse(msg.data);
-      const k = data.k;
+      const { k } = data;
 
       this.candle$.next({
-        time: Math.floor(k.t / 1000),
+        time: k.t,
+        // time: Math.floor(k.t / 1000) || Math.floor(new Date().getTime() / 1000),
         open: +k.o,
         high: +k.h,
         low: +k.l,
@@ -60,7 +62,7 @@ export class BinanceService {
 
   structureData(data: any[]): Candle[] {
     return data.map((d: any) => ({
-      time: Math.floor(d[0] / 1000),
+      time: Math.floor(d[0]),
       open: +d[1],
       high: +d[2],
       low: +d[3],
@@ -68,6 +70,23 @@ export class BinanceService {
       volume: +d[5],
       medio: (+d[2] + +d[3]) / 2,
     }));
+  }
+
+  updateCalculateEMA(data: Candle[], period: number): any[] {
+    const k = 2 / (period + 1);
+    let emaPrev = data[0].close;
+    console.log('emaPrev :>> ', emaPrev);
+
+    return data.map((c) => {
+      const ema = c.close * k + emaPrev * (1 - k);
+
+      emaPrev = ema;
+
+      return {
+        time: c.time,
+        value: ema,
+      };
+    });
   }
 }
 
