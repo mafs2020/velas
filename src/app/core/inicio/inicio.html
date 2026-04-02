@@ -6,33 +6,12 @@
 <!-- #298a7b -->
 <!-- {{ otro | async | json }} -->
 
-<!-- <label for="time">temporalidad</label> -->
-<!-- <select id="time" [(ngModel)]="time"> -->
-<!-- <option disabled selected value="">tiempo</option> -->
-<!-- <option value="1m">1m</option> -->
-<!-- <option value="5m">5m</option> -->
-<!-- <option value="15m">15m</option> -->
-<!-- <option value="1h">1h</option> -->
-<!-- <option value="2h">2h</option> -->
-<!-- <option value="3h">3h</option> -->
-<!-- <option value="4h">4h</option> -->
-<!-- <option value="1d">1d</option> -->
-<!-- <option value="1w">1w</option> -->
-<!-- <option value="1m">1m</option> -->
-<!-- </select> -->
-<!-- <label for="currency">criptomoneda</label> -->
-<!-- <select id="currency" [(ngModel)]="currency"> -->
-<!-- <option selected value="">moneda</option> -->
-<!-- <option value="btcusdt">BTC/USDT</option> -->
-<!-- <option value="ethusdt">ETH/USDT</option> -->
-<!-- </select> -->
-
 <!-- Render form value that updates automatically as user types -->
 <div class="flex flex-col items-center gap-4 my-6">
   <div class="flex flex-wrap justify-center gap-2 w-full">
     <button
       (click)="gg('1m')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '1m'"
       aria-label="Seleccionar 1 minuto"
     >
@@ -40,7 +19,7 @@
     </button>
     <button
       (click)="gg('5m')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '5m'"
       aria-label="Seleccionar 5 minutos"
     >
@@ -48,7 +27,7 @@
     </button>
     <button
       (click)="gg('15m')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '15m'"
       aria-label="Seleccionar 15 minutos"
     >
@@ -56,7 +35,7 @@
     </button>
     <button
       (click)="gg('1h')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '1h'"
       aria-label="Seleccionar 1 hora"
     >
@@ -64,7 +43,7 @@
     </button>
     <button
       (click)="gg('2h')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '2h'"
       aria-label="Seleccionar 2 horas"
     >
@@ -72,7 +51,7 @@
     </button>
     <button
       (click)="gg('4h')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '4h'"
       aria-label="Seleccionar 4 horas"
     >
@@ -80,7 +59,7 @@
     </button>
     <button
       (click)="gg('1d')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors cursor-pointer"
       [class.selected]="time() === '1d'"
       aria-label="Seleccionar 1 día"
     >
@@ -88,7 +67,7 @@
     </button>
     <button
       (click)="gg('1w')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '1w'"
       aria-label="Seleccionar 1 semana"
     >
@@ -96,7 +75,7 @@
     </button>
     <button
       (click)="gg('1M')"
-      class="px-4 py-2 rounded-md bg-[#298a7b] text-white font-semibold shadow hover:bg-[#246e62] focus:outline-none focus:ring-2 focus:ring-[#d2513b] focus:ring-offset-2 transition-colors"
+      class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '1M'"
       aria-label="Seleccionar 1 mes"
     >

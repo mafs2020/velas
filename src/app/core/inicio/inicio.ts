@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AsyncPipe, JsonPipe, NgClass } from '@angular/common';
-import { map, Observable, tap } from 'rxjs';
+import { count, finalize, map, Observable, retry, tap } from 'rxjs';
 
 import {
   CandlestickSeries,
@@ -22,6 +22,8 @@ import {
   UTCTimestamp,
   LineSeries,
   AreaSeries,
+  WhitespaceData,
+  Time,
   // SeriesMarker,
   // Time,
 } from 'lightweight-charts';
@@ -42,7 +44,7 @@ import { currency, timeframe } from '../interfaces';
 
 @Component({
   selector: 'app-inicio',
-  imports: [AsyncPipe, FormsModule, NgClass],
+  imports: [AsyncPipe, FormsModule],
   // imports: [AsyncPipe, JsonPipe, FormField],
   templateUrl: './inicio.html',
   styleUrl: './inicio.css',
@@ -50,7 +52,8 @@ import { currency, timeframe } from '../interfaces';
 })
 export class Inicio implements AfterViewInit, OnDestroy {
   // fecha = Temporal.now();
-  time = signal<string>('1h');
+  counter = 0;
+  time = signal<string>('1m');
   currency = signal<string>('btcusdt');
   binance = inject(BinanceService);
   @ViewChild('chart') chartEl!: ElementRef;
@@ -68,6 +71,7 @@ export class Inicio implements AfterViewInit, OnDestroy {
 
   areaSeries!: ISeriesApi<'Area'>;
   areaSeries200!: ISeriesApi<'Area'>;
+  lastVela!: Candle;
 
   // graficaModel = signal<graficaData>({
   //   time: '1m',
@@ -109,14 +113,18 @@ export class Inicio implements AfterViewInit, OnDestroy {
         .then((res) => res.json())
         .then((data) => {
           const velas = this.binance.structureData(data);
+
+          this.lastVela = velas[velas.length - 1];
+          console.log('this.lastVela :>> ', this.lastVela);
+
           this.series.setData(velas as any);
 
-          this.ema3.setData(calculateEMA(velas, 3) as any);
-          this.ema9.setData(calculateEMA(velas, 9) as any);
-          this.ema20.setData(calculateEMA(velas, 20) as any);
-          this.ema50.setData(calculateEMA(velas, 50) as any);
+          // this.ema3.setData(calculateEMA(velas, 3) as any);
+          // this.ema9.setData(calculateEMA(velas, 9) as any);
+          // this.ema20.setData(calculateEMA(velas, 20) as any);
+          // this.ema50.setData(calculateEMA(velas, 50) as any);
           this.ema200.setData(calculateEMA(velas, 200) as any);
-          this.areaSeries200.setData(calculateEMA(velas, 200) as any);
+          // this.areaSeries200.setData(calculateEMA(velas, 200) as any);
           const ff = calculateBollinger(velas);
           this.bbUpper.setData(ff.upper as any);
           this.bbMiddle.setData(ff.middle as any);
@@ -198,13 +206,28 @@ export class Inicio implements AfterViewInit, OnDestroy {
         close: c.close,
       });
 
-      this.ema3.update(calculateEMA([c], 3) as any);
-      this.ema9.update(calculateEMA([c], 9) as any);
-      this.ema20.update(calculateEMA([c], 20) as any);
-      this.ema50.update(calculateEMA([c], 50) as any);
-      this.ema200.update(calculateEMA([c], 200) as any);
-      this.areaSeries200.update(calculateEMA([c], 200) as any);
+      // console.log('this.lastVela :>> ', this.lastVela);
+
+      // this.ema3.update({ time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close });
+      // this.ema9.update({ time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close });
+      // this.ema20.update({ time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close });
+      // this.ema50.update({ time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close });
+      // console.log(f.at(1));
+      // const g = [...f, { time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close } ];
+      // this.areaSeries200.update({
+      //   time: this.lastVela.time as UTCTimestamp,
+      //   value: this.lastVela.close,
+      // });
+      // this.lastVela = c;
+      // return c;
     }),
+    // count((c, t) => {
+    //   console.log('t :>> ', c);
+    //   return true;
+    // }),
+    // tap(() => console.log(++this.counter)),
+    // retry(2),
+    finalize(() => console.log('='.repeat(20) + ' STREAM COMPLETED ' + '='.repeat(20))),
   );
   ngAfterViewInit() {
     this.chart = createChart(this.chartEl.nativeElement, {
@@ -247,11 +270,11 @@ export class Inicio implements AfterViewInit, OnDestroy {
       borderVisible: false,
     });
 
-    this.ema3 = this.chart.addSeries(LineSeries, { color: '#2f76aa', lineWidth: 2 });
-    this.ema9 = this.chart.addSeries(LineSeries, { color: '#3b9a33', lineWidth: 2, lineStyle: 3 });
-    this.ema20 = this.chart.addSeries(LineSeries, { color: '#3b9a33', lineWidth: 2 });
-    this.ema50 = this.chart.addSeries(LineSeries, { color: '#f37523', lineWidth: 2 });
-    this.ema200 = this.chart.addSeries(LineSeries, { color: '#d71526', lineWidth: 2 });
+    this.ema3 = this.chart.addSeries(LineSeries, { color: '#2f76aa', lineWidth: 3 });
+    this.ema9 = this.chart.addSeries(LineSeries, { color: '#3b9a33', lineWidth: 3, lineStyle: 3 });
+    this.ema20 = this.chart.addSeries(LineSeries, { color: '#3b9a33', lineWidth: 3 });
+    this.ema50 = this.chart.addSeries(LineSeries, { color: '#f37523', lineWidth: 3 });
+    this.ema200 = this.chart.addSeries(LineSeries, { color: '#d71526', lineWidth: 3 });
     this.medio = this.chart.addSeries(LineSeries, { color: '#a5ecb8', lineWidth: 2 });
     // this.medio = this.chart.addSeries(LineSeries, { color: '#8888ff', lineWidth: 2 });
 
