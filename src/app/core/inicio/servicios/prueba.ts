@@ -72,21 +72,14 @@ export class BinanceService {
     }));
   }
 
-  updateCalculateEMA(data: Candle[], period: number): any[] {
-    const k = 2 / (period + 1);
-    let emaPrev = data[0].close;
-    console.log('emaPrev :>> ', emaPrev);
+  updateCalculateEMA(vela: Candle, period: number, emaPrev: number): LineData<Time> {
+    const alpha = 2 / (period + 1);
 
-    return data.map((c) => {
-      const ema = c.close * k + emaPrev * (1 - k);
-
-      emaPrev = ema;
-
-      return {
-        time: c.time,
-        value: ema,
-      };
-    });
+    const emaNueva = vela.close * alpha + emaPrev * (1 - alpha);
+    return {
+      time: vela.time as UTCTimestamp,
+      value: emaNueva,
+    };
   }
 }
 
