@@ -24,6 +24,7 @@ import {
   AreaSeries,
   WhitespaceData,
   Time,
+  LineData,
   // SeriesMarker,
   // Time,
 } from 'lightweight-charts';
@@ -71,8 +72,16 @@ export class Inicio implements AfterViewInit, OnDestroy {
 
   areaSeries!: ISeriesApi<'Area'>;
   areaSeries200!: ISeriesApi<'Area'>;
-  lastVela!: Candle;
-
+  n3!: LineData<Time>;
+  n9!: LineData<Time>;
+  n20!: LineData<Time>;
+  n50!: LineData<Time>;
+  n200!: LineData<Time>[];
+  ema3Anterior!: { time: Time; value: number };
+  ema9Anterior!: { time: Time; value: number };
+  ema20Anterior!: { time: Time; value: number };
+  ema50Anterior!: { time: Time; value: number };
+  ema200Anterior!: { time: Time; value: number };
   // graficaModel = signal<graficaData>({
   //   time: '1m',
   //   currency: 'btcusdt',
@@ -107,24 +116,32 @@ export class Inicio implements AfterViewInit, OnDestroy {
   rxr = resource({
     loader: ({ params, abortSignal }) =>
       fetch(
-        `https://api.binance.com/api/v3/klines?symbol=${params.symbol.toUpperCase()}&interval=${params.interval}&limit=400`,
+        `https://api.binance.com/api/v3/klines?symbol=${params.symbol.toUpperCase()}&interval=${params.interval}&limit=500`,
         { signal: abortSignal },
       )
         .then((res) => res.json())
         .then((data) => {
           const velas = this.binance.structureData(data);
 
-          this.lastVela = velas[velas.length - 1];
-          console.log('this.lastVela :>> ', this.lastVela);
-
           this.series.setData(velas as any);
+          const nTres = calculateEMA(velas, 3);
+          const nNueve = calculateEMA(velas, 9);
+          const nVeinte = calculateEMA(velas, 20);
+          const nCincuenta = calculateEMA(velas, 50);
+          const nDoscientos = calculateEMA(velas, 200);
 
-          // this.ema3.setData(calculateEMA(velas, 3) as any);
-          // this.ema9.setData(calculateEMA(velas, 9) as any);
-          // this.ema20.setData(calculateEMA(velas, 20) as any);
-          // this.ema50.setData(calculateEMA(velas, 50) as any);
-          this.ema200.setData(calculateEMA(velas, 200) as any);
-          // this.areaSeries200.setData(calculateEMA(velas, 200) as any);
+          this.ema3Anterior = nTres.at(-1) as LineData<Time>;
+          this.ema9Anterior = nNueve.at(-1) as LineData<Time>;
+          this.ema20Anterior = nVeinte.at(-1) as LineData<Time>;
+          this.ema50Anterior = nCincuenta.at(-1) as LineData<Time>;
+          this.ema200Anterior = nDoscientos.at(-1) as LineData<Time>;
+
+          this.ema3.setData(nTres);
+          this.ema9.setData(nNueve);
+          this.ema20.setData(nVeinte);
+          this.ema50.setData(nCincuenta);
+          this.ema200.setData(nDoscientos);
+          this.areaSeries200.setData(nDoscientos);
           const ff = calculateBollinger(velas);
           this.bbUpper.setData(ff.upper as any);
           this.bbMiddle.setData(ff.middle as any);
@@ -206,25 +223,72 @@ export class Inicio implements AfterViewInit, OnDestroy {
         close: c.close,
       });
 
-      // console.log('this.lastVela :>> ', this.lastVela);
+      const jkl3 = this.binance.updateCalculateEMA(c, 3, this.ema3Anterior.value);
+      const jkl9 = this.binance.updateCalculateEMA(c, 9, this.ema9Anterior.value);
+      const jkl20 = this.binance.updateCalculateEMA(c, 20, this.ema20Anterior.value);
+      const jkl50 = this.binance.updateCalculateEMA(c, 50, this.ema50Anterior.value);
+      const jkl200 = this.binance.updateCalculateEMA(c, 200, this.ema200Anterior.value);
+      if (c.time != this.ema3Anterior.time) {
+        this.ema3Anterior = jkl3;
+        this.ema3.update({
+          time: jkl3.time as UTCTimestamp,
+          value: jkl3.value,
+        });
+      }
 
-      // this.ema3.update({ time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close });
-      // this.ema9.update({ time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close });
-      // this.ema20.update({ time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close });
-      // this.ema50.update({ time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close });
-      // console.log(f.at(1));
-      // const g = [...f, { time: this.lastVela.time as UTCTimestamp, value: this.lastVela.close } ];
-      // this.areaSeries200.update({
-      //   time: this.lastVela.time as UTCTimestamp,
-      //   value: this.lastVela.close,
+      if (c.time != this.ema9Anterior.time) {
+        this.ema9Anterior = jkl9;
+        this.ema9.update({
+          time: jkl9.time as UTCTimestamp,
+          value: jkl9.value,
+        });
+      }
+
+      if (c.time != this.ema20Anterior.time) {
+        this.ema20Anterior = jkl20;
+        this.ema20.update({
+          time: jkl20.time as UTCTimestamp,
+          value: jkl20.value,
+        });
+      }
+
+      if (c.time != this.ema50Anterior.time) {
+        this.ema50Anterior = jkl50;
+        this.ema50.update({
+          time: jkl50.time as UTCTimestamp,
+          value: jkl50.value,
+        });
+      }
+
+      if (c.time != this.ema200Anterior.time) {
+        this.ema200Anterior = jkl200;
+        this.ema200.update({
+          time: jkl200.time as UTCTimestamp,
+          value: jkl200.value,
+        });
+      }
+      // const ff = this.binance.updateCalculateEMA([this.n200], 200);
+      // console.log('------------------------------------');
+      // console.log('------------------------------------');
+
+      // this.ema200.update({
+      //   time: ff.time as UTCTimestamp,
+      //   value: ff.value,
       // });
-      // this.lastVela = c;
-      // return c;
+      // this.n200.shift();
+      // this.n200.push({ time: ff.time as UTCTimestamp, value: ff.value, close: c.close });
+      // this.n200 = {
+      //   time: c.time as UTCTimestamp,
+      //   value: ff.value,
+      //   close: c.close,
+      // } as LineData<Time>;
+      // console.log(new Date(ff.time));
+      // console.log(new Date(ff.value));
+      // TODO el valor esta mal;
+      // console.log('+'.repeat(25));
+      // this.n200 = { time: ff[1].time as UTCTimestamp, value: ff[0].value };
+      // this.n200 = { time: ff[1].time as UTCTimestamp, value: ff[0].value };
     }),
-    // count((c, t) => {
-    //   console.log('t :>> ', c);
-    //   return true;
-    // }),
     // tap(() => console.log(++this.counter)),
     // retry(2),
     finalize(() => console.log('='.repeat(20) + ' STREAM COMPLETED ' + '='.repeat(20))),
