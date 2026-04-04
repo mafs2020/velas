@@ -82,6 +82,7 @@ export class Inicio implements AfterViewInit, OnDestroy {
   ema20Anterior!: { time: Time; value: number };
   ema50Anterior!: { time: Time; value: number };
   ema200Anterior!: { time: Time; value: number };
+  bollingerDataAnterior!: Candle[];
   // graficaModel = signal<graficaData>({
   //   time: '1m',
   //   currency: 'btcusdt',
@@ -122,6 +123,8 @@ export class Inicio implements AfterViewInit, OnDestroy {
         .then((res) => res.json())
         .then((data) => {
           const velas = this.binance.structureData(data);
+
+          this.bollingerDataAnterior = velas.slice(-20); // Guardamos las últimas 20 velas para el cálculo de Bollinger
 
           this.series.setData(velas as any);
           const nTres = calculateEMA(velas, 3);
@@ -228,7 +231,13 @@ export class Inicio implements AfterViewInit, OnDestroy {
       const jkl20 = this.binance.updateCalculateEMA(c, 20, this.ema20Anterior.value);
       const jkl50 = this.binance.updateCalculateEMA(c, 50, this.ema50Anterior.value);
       const jkl200 = this.binance.updateCalculateEMA(c, 200, this.ema200Anterior.value);
+
+      console.log('c.time :>> ', new Date(c.time));
+      console.log('this.ema3Anterior :>> ', new Date(this.ema3Anterior.time as UTCTimestamp));
+      console.log('jkl3.time :>> ', new Date(jkl3.time as UTCTimestamp));
+
       if (c.time != this.ema3Anterior.time) {
+        console.log('se actualizo');
         this.ema3Anterior = jkl3;
         this.ema3.update({
           time: jkl3.time as UTCTimestamp,
@@ -275,6 +284,37 @@ export class Inicio implements AfterViewInit, OnDestroy {
         time: c.time as UTCTimestamp,
         value: c.medio,
       });
+      if (c.time != this.bollingerDataAnterior[this.bollingerDataAnterior.length - 1]?.time) {
+        const bollinger = calculateBollinger([...this.bollingerDataAnterior, c]);
+        this.bbUpper.update({
+          time: c.time as UTCTimestamp,
+          value: bollinger.upper[bollinger.upper.length - 1].value,
+        });
+        this.bbMiddle.update({
+          time: c.time as UTCTimestamp,
+          value: bollinger.middle[bollinger.middle.length - 1].value,
+        });
+        this.bbLower.update({
+          time: c.time as UTCTimestamp,
+          value: bollinger.lower[bollinger.lower.length - 1].value,
+        });
+
+        this.bollingerDataAnterior.push(c);
+        this.bollingerDataAnterior.shift(); // Mantenemos solo las últimas 20 velas para el cálculo de Bollinger
+      }
+
+      // this.bbUpper.update({
+      //   time: c.time as UTCTimestamp,
+      //   value: calculateBollinger([c], 20, 2).upper[0].value,
+      // });
+      // this.bbMiddle.update({
+      //   time: c.time as UTCTimestamp,
+      //   value: calculateBollinger([c], 20, 2).middle[0].value,
+      // });
+      // this.bbLower.update({
+      //   time: c.time as UTCTimestamp,
+      //   value: calculateBollinger([c], 20, 2).lower[0].value,
+      // });
     }),
     // tap(() => console.log(++this.counter)),
     // retry(2),
