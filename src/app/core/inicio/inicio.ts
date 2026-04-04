@@ -141,7 +141,6 @@ export class Inicio implements AfterViewInit, OnDestroy {
           this.ema20.setData(nVeinte);
           this.ema50.setData(nCincuenta);
           this.ema200.setData(nDoscientos);
-          this.areaSeries200.setData(nDoscientos);
           const ff = calculateBollinger(velas);
           this.bbUpper.setData(ff.upper as any);
           this.bbMiddle.setData(ff.middle as any);
@@ -149,10 +148,11 @@ export class Inicio implements AfterViewInit, OnDestroy {
 
           const lineData = velas.map((datapoint) => ({
             time: datapoint.time,
-            value: (datapoint.close + datapoint.open) / 2,
+            value: datapoint.medio,
           }));
 
           this.areaSeries.setData(lineData as any);
+          this.areaSeries200.setData(nDoscientos);
 
           // const medianMarkers = velas.map((candle) => ({
           //   time: candle.time,
@@ -266,28 +266,15 @@ export class Inicio implements AfterViewInit, OnDestroy {
           time: jkl200.time as UTCTimestamp,
           value: jkl200.value,
         });
+        this.areaSeries200.update({
+          time: jkl200.time as UTCTimestamp,
+          value: jkl200.value,
+        });
       }
-      // const ff = this.binance.updateCalculateEMA([this.n200], 200);
-      // console.log('------------------------------------');
-      // console.log('------------------------------------');
-
-      // this.ema200.update({
-      //   time: ff.time as UTCTimestamp,
-      //   value: ff.value,
-      // });
-      // this.n200.shift();
-      // this.n200.push({ time: ff.time as UTCTimestamp, value: ff.value, close: c.close });
-      // this.n200 = {
-      //   time: c.time as UTCTimestamp,
-      //   value: ff.value,
-      //   close: c.close,
-      // } as LineData<Time>;
-      // console.log(new Date(ff.time));
-      // console.log(new Date(ff.value));
-      // TODO el valor esta mal;
-      // console.log('+'.repeat(25));
-      // this.n200 = { time: ff[1].time as UTCTimestamp, value: ff[0].value };
-      // this.n200 = { time: ff[1].time as UTCTimestamp, value: ff[0].value };
+      this.areaSeries.update({
+        time: c.time as UTCTimestamp,
+        value: c.medio,
+      });
     }),
     // tap(() => console.log(++this.counter)),
     // retry(2),
