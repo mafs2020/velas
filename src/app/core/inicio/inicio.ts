@@ -232,9 +232,11 @@ export class Inicio implements AfterViewInit, OnDestroy {
       const jkl50 = this.binance.updateCalculateEMA(c, 50, this.ema50Anterior.value);
       const jkl200 = this.binance.updateCalculateEMA(c, 200, this.ema200Anterior.value);
 
+      console.log('='.repeat(25));
       console.log('c.time :>> ', new Date(c.time));
-      console.log('this.ema3Anterior :>> ', new Date(this.ema3Anterior.time as UTCTimestamp));
-      console.log('jkl3.time :>> ', new Date(jkl3.time as UTCTimestamp));
+      console.log('='.repeat(25));
+      // console.log('this.ema3Anterior :>> ', new Date(this.ema3Anterior.time as UTCTimestamp));
+      // console.log('jkl3.time :>> ', new Date(jkl3.time as UTCTimestamp));
 
       if (c.time != this.ema3Anterior.time) {
         console.log('se actualizo');
@@ -243,7 +245,12 @@ export class Inicio implements AfterViewInit, OnDestroy {
           time: jkl3.time as UTCTimestamp,
           value: jkl3.value,
         });
+        this.ema3Anterior = { time: c.time as UTCTimestamp, value: jkl3.value };
       }
+      this.ema3.update({
+        time: jkl3.time as UTCTimestamp,
+        value: jkl3.value,
+      });
 
       if (c.time != this.ema9Anterior.time) {
         this.ema9Anterior = jkl9;
@@ -251,7 +258,12 @@ export class Inicio implements AfterViewInit, OnDestroy {
           time: jkl9.time as UTCTimestamp,
           value: jkl9.value,
         });
+        this.ema9Anterior = { time: c.time as UTCTimestamp, value: jkl9.value };
       }
+      this.ema9.update({
+        time: jkl9.time as UTCTimestamp,
+        value: jkl9.value,
+      });
 
       if (c.time != this.ema20Anterior.time) {
         this.ema20Anterior = jkl20;
@@ -259,7 +271,12 @@ export class Inicio implements AfterViewInit, OnDestroy {
           time: jkl20.time as UTCTimestamp,
           value: jkl20.value,
         });
+        this.ema20Anterior = { time: c.time as UTCTimestamp, value: jkl20.value };
       }
+      this.ema20.update({
+        time: jkl20.time as UTCTimestamp,
+        value: jkl20.value,
+      });
 
       if (c.time != this.ema50Anterior.time) {
         this.ema50Anterior = jkl50;
@@ -267,7 +284,12 @@ export class Inicio implements AfterViewInit, OnDestroy {
           time: jkl50.time as UTCTimestamp,
           value: jkl50.value,
         });
+        this.ema50Anterior = { time: c.time as UTCTimestamp, value: jkl50.value };
       }
+      this.ema50.update({
+        time: jkl50.time as UTCTimestamp,
+        value: jkl50.value,
+      });
 
       if (c.time != this.ema200Anterior.time) {
         this.ema200Anterior = jkl200;
@@ -279,7 +301,12 @@ export class Inicio implements AfterViewInit, OnDestroy {
           time: jkl200.time as UTCTimestamp,
           value: jkl200.value,
         });
+        this.ema200Anterior = { time: c.time as UTCTimestamp, value: jkl200.value };
       }
+      this.ema200.update({
+        time: jkl200.time as UTCTimestamp,
+        value: jkl200.value,
+      });
       this.areaSeries.update({
         time: c.time as UTCTimestamp,
         value: c.medio,
@@ -299,22 +326,10 @@ export class Inicio implements AfterViewInit, OnDestroy {
           value: bollinger.lower[bollinger.lower.length - 1].value,
         });
 
+        // Mantenemos solo las últimas 20 velas para el cálculo de Bollinger
         this.bollingerDataAnterior.push(c);
-        this.bollingerDataAnterior.shift(); // Mantenemos solo las últimas 20 velas para el cálculo de Bollinger
+        this.bollingerDataAnterior.shift();
       }
-
-      // this.bbUpper.update({
-      //   time: c.time as UTCTimestamp,
-      //   value: calculateBollinger([c], 20, 2).upper[0].value,
-      // });
-      // this.bbMiddle.update({
-      //   time: c.time as UTCTimestamp,
-      //   value: calculateBollinger([c], 20, 2).middle[0].value,
-      // });
-      // this.bbLower.update({
-      //   time: c.time as UTCTimestamp,
-      //   value: calculateBollinger([c], 20, 2).lower[0].value,
-      // });
     }),
     // tap(() => console.log(++this.counter)),
     // retry(2),
@@ -327,7 +342,7 @@ export class Inicio implements AfterViewInit, OnDestroy {
       layout: { background: { color: '#0e0e0e' }, textColor: '#ccc' },
       grid: { vertLines: { color: '#1f1f1f' }, horzLines: { color: '#1f1f1f' } },
       localization: {
-        dateFormat: 'dd/MM/yyyy ',
+        // dateFormat: '',
         locale: 'es-MX',
         priceFormatter: (price: any) => `$ ${price.toFixed(2)}`,
       },
