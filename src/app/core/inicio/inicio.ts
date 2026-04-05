@@ -232,12 +232,6 @@ export class Inicio implements AfterViewInit, OnDestroy {
       const jkl50 = this.binance.updateCalculateEMA(c, 50, this.ema50Anterior.value);
       const jkl200 = this.binance.updateCalculateEMA(c, 200, this.ema200Anterior.value);
 
-      console.log('='.repeat(25));
-      console.log('c.time :>> ', new Date(c.time));
-      console.log('='.repeat(25));
-      // console.log('this.ema3Anterior :>> ', new Date(this.ema3Anterior.time as UTCTimestamp));
-      // console.log('jkl3.time :>> ', new Date(jkl3.time as UTCTimestamp));
-
       if (c.time != this.ema3Anterior.time) {
         console.log('se actualizo');
         this.ema3Anterior = jkl3;
