@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { AsyncPipe, JsonPipe, NgClass } from '@angular/common';
-import { count, finalize, map, Observable, retry, tap } from 'rxjs';
+import { count, finalize, map, Observable, retry, take, tap } from 'rxjs';
 
 import {
   CandlestickSeries,
@@ -83,6 +83,8 @@ export class Inicio implements AfterViewInit, OnDestroy {
   ema50Anterior!: { time: Time; value: number };
   ema200Anterior!: { time: Time; value: number };
   bollingerDataAnterior!: Candle[];
+  lastVela!: number;
+  isFirst = true;
   // graficaModel = signal<graficaData>({
   //   time: '1m',
   //   currency: 'btcusdt',
@@ -123,8 +125,11 @@ export class Inicio implements AfterViewInit, OnDestroy {
         .then((res) => res.json())
         .then((data) => {
           const velas = this.binance.structureData(data);
+          this.isFirst = true;
 
           this.bollingerDataAnterior = velas.slice(-20); // Guardamos las últimas 20 velas para el cálculo de Bollinger
+
+          this.lastVela = this.bollingerDataAnterior.at(-1)!.time;
 
           this.series.setData(velas as any);
           const nTres = calculateEMA(velas, 3);
@@ -218,8 +223,13 @@ export class Inicio implements AfterViewInit, OnDestroy {
 
   sub?: Observable<Candle> = this.binance.connect(this.currency(), this.time()).pipe(
     tap((c: Candle) => {
+      const tiempo = this.calculateTime(c.time);
+      console.log('tiempo :>> ', tiempo);
+      console.log('tiempo :>> ', new Date(tiempo));
+      const isNew = tiempo !== this.lastVela;
+
       this.series.update({
-        time: c.time as UTCTimestamp,
+        time: tiempo as UTCTimestamp,
         open: c.open,
         high: c.high,
         low: c.low,
@@ -232,98 +242,109 @@ export class Inicio implements AfterViewInit, OnDestroy {
       const jkl50 = this.binance.updateCalculateEMA(c, 50, this.ema50Anterior.value);
       const jkl200 = this.binance.updateCalculateEMA(c, 200, this.ema200Anterior.value);
 
-      if (c.time != this.ema3Anterior.time) {
-        console.log('se actualizo');
-        this.ema3Anterior = jkl3;
-        this.ema3.update({
-          time: jkl3.time as UTCTimestamp,
-          value: jkl3.value,
-        });
-        this.ema3Anterior = { time: c.time as UTCTimestamp, value: jkl3.value };
+      if (isNew) {
+        // 🟢 CONFIRMAS
+        this.ema200Anterior = { time: tiempo as UTCTimestamp, value: jkl200.value };
+        this.lastVela = tiempo;
       }
-      this.ema3.update({
-        time: jkl3.time as UTCTimestamp,
-        value: jkl3.value,
-      });
 
-      if (c.time != this.ema9Anterior.time) {
-        this.ema9Anterior = jkl9;
-        this.ema9.update({
-          time: jkl9.time as UTCTimestamp,
-          value: jkl9.value,
-        });
-        this.ema9Anterior = { time: c.time as UTCTimestamp, value: jkl9.value };
-      }
-      this.ema9.update({
-        time: jkl9.time as UTCTimestamp,
-        value: jkl9.value,
-      });
-
-      if (c.time != this.ema20Anterior.time) {
-        this.ema20Anterior = jkl20;
-        this.ema20.update({
-          time: jkl20.time as UTCTimestamp,
-          value: jkl20.value,
-        });
-        this.ema20Anterior = { time: c.time as UTCTimestamp, value: jkl20.value };
-      }
-      this.ema20.update({
-        time: jkl20.time as UTCTimestamp,
-        value: jkl20.value,
-      });
-
-      if (c.time != this.ema50Anterior.time) {
-        this.ema50Anterior = jkl50;
-        this.ema50.update({
-          time: jkl50.time as UTCTimestamp,
-          value: jkl50.value,
-        });
-        this.ema50Anterior = { time: c.time as UTCTimestamp, value: jkl50.value };
-      }
-      this.ema50.update({
-        time: jkl50.time as UTCTimestamp,
-        value: jkl50.value,
-      });
-
-      if (c.time != this.ema200Anterior.time) {
-        this.ema200Anterior = jkl200;
-        this.ema200.update({
-          time: jkl200.time as UTCTimestamp,
-          value: jkl200.value,
-        });
-        this.areaSeries200.update({
-          time: jkl200.time as UTCTimestamp,
-          value: jkl200.value,
-        });
-        this.ema200Anterior = { time: c.time as UTCTimestamp, value: jkl200.value };
-      }
       this.ema200.update({
         time: jkl200.time as UTCTimestamp,
         value: jkl200.value,
       });
-      this.areaSeries.update({
-        time: c.time as UTCTimestamp,
-        value: c.medio,
-      });
-      if (c.time != this.bollingerDataAnterior[this.bollingerDataAnterior.length - 1]?.time) {
-        const bollinger = calculateBollinger([...this.bollingerDataAnterior, c]);
-        this.bbUpper.update({
-          time: c.time as UTCTimestamp,
-          value: bollinger.upper[bollinger.upper.length - 1].value,
-        });
-        this.bbMiddle.update({
-          time: c.time as UTCTimestamp,
-          value: bollinger.middle[bollinger.middle.length - 1].value,
-        });
-        this.bbLower.update({
-          time: c.time as UTCTimestamp,
-          value: bollinger.lower[bollinger.lower.length - 1].value,
-        });
 
-        // Mantenemos solo las últimas 20 velas para el cálculo de Bollinger
-        this.bollingerDataAnterior.push(c);
-        this.bollingerDataAnterior.shift();
-      }
+      // if (c.time != this.ema3Anterior.time) {
+      //   console.log('se actualizo');
+      //   this.ema3Anterior = jkl3;
+      //   this.ema3.update({
+      //     time: jkl3.time as UTCTimestamp,
+      //     value: jkl3.value,
+      //   });
+      //   this.ema3Anterior = { time: c.time as UTCTimestamp, value: jkl3.value };
+      // }
+      // this.ema3.update({
+      //   time: jkl3.time as UTCTimestamp,
+      //   value: jkl3.value,
+      // });
+
+      // if (c.time != this.ema9Anterior.time) {
+      //   this.ema9Anterior = jkl9;
+      //   this.ema9.update({
+      //     time: jkl9.time as UTCTimestamp,
+      //     value: jkl9.value,
+      //   });
+      //   this.ema9Anterior = { time: c.time as UTCTimestamp, value: jkl9.value };
+      // }
+      // this.ema9.update({
+      //   time: jkl9.time as UTCTimestamp,
+      //   value: jkl9.value,
+      // });
+
+      // if (c.time != this.ema20Anterior.time) {
+      //   this.ema20Anterior = jkl20;
+      //   this.ema20.update({
+      //     time: jkl20.time as UTCTimestamp,
+      //     value: jkl20.value,
+      //   });
+      //   this.ema20Anterior = { time: c.time as UTCTimestamp, value: jkl20.value };
+      // }
+      // this.ema20.update({
+      //   time: jkl20.time as UTCTimestamp,
+      //   value: jkl20.value,
+      // });
+
+      // if (c.time != this.ema50Anterior.time) {
+      //   this.ema50Anterior = jkl50;
+      //   this.ema50.update({
+      //     time: jkl50.time as UTCTimestamp,
+      //     value: jkl50.value,
+      //   });
+      //   this.ema50Anterior = { time: c.time as UTCTimestamp, value: jkl50.value };
+      // }
+      // this.ema50.update({
+      //   time: jkl50.time as UTCTimestamp,
+      //   value: jkl50.value,
+      // });
+
+      // if (c.time != this.ema200Anterior.time) {
+      //   this.ema200Anterior = jkl200;
+      //   this.ema200.update({
+      //     time: jkl200.time as UTCTimestamp,
+      //     value: jkl200.value,
+      //   });
+      //   this.areaSeries200.update({
+      //     time: jkl200.time as UTCTimestamp,
+      //     value: jkl200.value,
+      //   });
+      //   this.ema200Anterior = { time: c.time as UTCTimestamp, value: jkl200.value };
+      // }
+      // this.ema200.update({
+      //   time: jkl200.time as UTCTimestamp,
+      //   value: jkl200.value,
+      // });
+      // this.areaSeries.update({
+      //   time: c.time as UTCTimestamp,
+      //   value: c.medio,
+      // });
+      // if (c.time != this.bollingerDataAnterior[this.bollingerDataAnterior.length - 1]?.time) {
+      //   const bollinger = calculateBollinger([...this.bollingerDataAnterior, c]);
+      //   this.bbUpper.update({
+      //     time: c.time as UTCTimestamp,
+      //     value: bollinger.upper[bollinger.upper.length - 1].value,
+      //   });
+      //   this.bbMiddle.update({
+      //     time: c.time as UTCTimestamp,
+      //     value: bollinger.middle[bollinger.middle.length - 1].value,
+      //   });
+      //   this.bbLower.update({
+      //     time: c.time as UTCTimestamp,
+      //     value: bollinger.lower[bollinger.lower.length - 1].value,
+      //   });
+
+      //   // Mantenemos solo las últimas 20 velas para el cálculo de Bollinger
+      //   this.bollingerDataAnterior.push(c);
+      //   this.bollingerDataAnterior.shift();
+      // }
     }),
     // tap(() => console.log(++this.counter)),
     // retry(2),
@@ -413,8 +434,22 @@ export class Inicio implements AfterViewInit, OnDestroy {
     this.binance.disconnect();
   }
 
-  gg(t: string) {
+  cambiarTemporalidad(t: string) {
     console.log(t);
     this.time.set(t);
+  }
+
+  calculateTime(timestamp: number): number {
+    // if (this.time() == '1m') return actual;
+    const intervalMap: Record<string, number> = {
+      '1m': 60_000,
+      '5m': 5 * 60_000,
+      '15m': 15 * 60_000,
+      '1h': 60 * 60_000,
+    };
+
+    const interval = intervalMap[this.time()];
+
+    return Math.floor(timestamp / interval) * interval;
   }
 }

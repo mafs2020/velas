@@ -10,7 +10,7 @@
 <div class="flex flex-col items-center gap-4 my-6">
   <div class="flex flex-wrap justify-center gap-2 w-full">
     <button
-      (click)="gg('1m')"
+      (click)="cambiarTemporalidad('1m')"
       class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '1m'"
       aria-label="Seleccionar 1 minuto"
@@ -18,7 +18,7 @@
       1m
     </button>
     <button
-      (click)="gg('5m')"
+      (click)="cambiarTemporalidad('5m')"
       class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '5m'"
       aria-label="Seleccionar 5 minutos"
@@ -26,7 +26,7 @@
       5m
     </button>
     <button
-      (click)="gg('15m')"
+      (click)="cambiarTemporalidad('15m')"
       class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '15m'"
       aria-label="Seleccionar 15 minutos"
@@ -34,7 +34,7 @@
       15m
     </button>
     <button
-      (click)="gg('1h')"
+      (click)="cambiarTemporalidad('1h')"
       class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '1h'"
       aria-label="Seleccionar 1 hora"
@@ -42,7 +42,7 @@
       1h
     </button>
     <button
-      (click)="gg('2h')"
+      (click)="cambiarTemporalidad('2h')"
       class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '2h'"
       aria-label="Seleccionar 2 horas"
@@ -50,7 +50,7 @@
       2h
     </button>
     <button
-      (click)="gg('4h')"
+      (click)="cambiarTemporalidad('4h')"
       class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '4h'"
       aria-label="Seleccionar 4 horas"
@@ -58,7 +58,7 @@
       4h
     </button>
     <button
-      (click)="gg('1d')"
+      (click)="cambiarTemporalidad('1d')"
       class="px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors cursor-pointer"
       [class.selected]="time() === '1d'"
       aria-label="Seleccionar 1 día"
@@ -66,7 +66,7 @@
       1d
     </button>
     <button
-      (click)="gg('1w')"
+      (click)="cambiarTemporalidad('1w')"
       class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '1w'"
       aria-label="Seleccionar 1 semana"
@@ -74,7 +74,7 @@
       1w
     </button>
     <button
-      (click)="gg('1M')"
+      (click)="cambiarTemporalidad('1M')"
       class="cursor-pointer px-4 py-2 rounded-md bg-gray-800 text-amber-200 font-semibold shadow hover:bg-gray-900 hover:text-amber-300 focus:outline-none focus:ring-2 focus:ring-amber-600 focus:ring-offset-2 transition-colors"
       [class.selected]="time() === '1M'"
       aria-label="Seleccionar 1 mes"
