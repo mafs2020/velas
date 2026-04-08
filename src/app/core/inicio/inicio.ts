@@ -320,7 +320,7 @@ export class Inicio implements AfterViewInit {
     );
 
     // Ajustar el rango visible
-    this.chart.timeScale().fitContent();
+    // this.chart.timeScale().fitContent();
   }
 
   /**
@@ -498,16 +498,29 @@ export class Inicio implements AfterViewInit {
    * Normaliza el timestamp según el timeframe seleccionado
    */
   private calculateNormalizedTime(timestamp: number): number {
+    const year = new Date().getUTCFullYear();
+    const mes = new Date().getUTCMonth();
     const intervalMap: Record<string, number> = {
+      // '1m': 60_000,
+      // '5m': 5 * 60_000,
+      // '15m': 15 * 60_000,
+      // '1h': 60 * 60_000,
+      // '2h': 2 * 60 * 60_000,
+      // '4h': 4 * 60 * 60_000,
+      // '1d': 24 * 60 * 60_000,
+      // '7d': 7 * 24 * 60 * 60_000,
+      // '1M': 30 * 24 * 60 * 60_000,
+
       '1m': 60_000,
       '5m': 5 * 60_000,
       '15m': 15 * 60_000,
       '1h': 60 * 60_000,
-      '2h': 2 * 60 * 60_000,
-      '4h': 4 * 60 * 60_000,
-      '1d': 24 * 60 * 60_000,
-      '7d': 7 * 24 * 60 * 60_000,
-      '1M': 30 * 24 * 60 * 60_000,
+      '2h': 60 * 2 * 60_000,
+      '4h': 60 * 4 * 60_000,
+      '1d': 60 * 24 * 60_000,
+      '7d': 60 * 24 * 7 * 60_000,
+      // TODO cambiar
+      '1M': 60 * 24 * new Date(year, mes + 1, 0).getDate() * 60_000,
     };
 
     const interval = intervalMap[this.time()] || 60_000;
