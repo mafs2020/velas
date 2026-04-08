@@ -4,13 +4,12 @@ import {
   Component,
   ElementRef,
   inject,
-  OnDestroy,
   resource,
   signal,
   ViewChild,
 } from '@angular/core';
 // import { AsyncPipe } from '@angular/common';
-import { finalize, Observable, Subscription, tap } from 'rxjs';
+import { EMPTY, finalize, fromEvent, Subject, takeUntil, tap } from 'rxjs';
 
 import {
   CandlestickSeries,
@@ -39,6 +38,9 @@ export class Inicio implements AfterViewInit {
   // Señales para timeframe y moneda
   time = signal<string>('1m');
   currency = signal<string>('btcusdt');
+
+  prueba$ = new Subject<void>();
+  prueba = this.prueba$.asObservable();
 
   // Servicios
   binance = inject(BinanceService);
@@ -113,12 +115,29 @@ export class Inicio implements AfterViewInit {
       symbol: this.currency(),
       interval: this.time(),
     }),
-    stream: ({ params, abortSignal }) =>
-      this.binance.connect(params.symbol, params.interval).pipe(
+    stream: ({ params, abortSignal }) => {
+      // 1. Verificación preventiva
+      if (abortSignal.aborted) return EMPTY;
+
+      // 2. Creamos el flujo de interrupción
+      const onAbort$ = fromEvent(abortSignal, 'abort');
+
+      return this.binance.connect(params.symbol, params.interval).pipe(
         tap((candle: Candle) => this.handleStreamUpdate(candle)),
-        tap((candle: Candle) => console.log('se inicio stream en temporalidad: ', this.time())),
-        finalize(() => console.log('🔌 Stream finalizado')),
-      ),
+        tap(() => console.log('se inicio stream en temporalidad: ', this.time())),
+
+        takeUntil(onAbort$),
+        // takeUntil(this.prueba$),
+        tap({
+          next: (candle) => this.handleStreamUpdate(candle),
+          subscribe: () => console.log(`✅ Conectando a ${params.symbol} (${params.interval})`),
+        }),
+        finalize(() => {
+          console.log('🔌 Stream finalizado');
+          this.binance.disconnect();
+        }),
+      );
+    },
 
     // const stream = `${symbol.toLowerCase()}@kline_${interval}`;
     // const url = `wss://stream.binance.com:9443/ws/${stream}`;
