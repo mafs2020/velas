@@ -123,7 +123,7 @@ export class Inicio implements AfterViewInit {
       const onAbort$ = fromEvent(abortSignal, 'abort');
 
       return this.binance.connect(params.symbol, params.interval).pipe(
-        tap((candle: Candle) => this.handleStreamUpdate(candle)),
+        // tap((candle: Candle) => this.handleStreamUpdate(candle)),
         tap(() => console.log('se inicio stream en temporalidad: ', this.time())),
 
         takeUntil(onAbort$),
@@ -287,10 +287,10 @@ export class Inicio implements AfterViewInit {
     if (!this.series || velas.length === 0) return;
 
     // Guardar últimas 20 velas para Bollinger
-    this.bollingerDataAnterior = [...velas.slice(-20)];
+    this.bollingerDataAnterior = velas.slice(-20);
 
     // Establecer última vela
-    this.lastVela = velas[velas.length - 1]?.time || 0;
+    this.lastVela = velas.at(-1)!.time;
 
     // Configurar datos de velas
     this.series.setData(velas as any);
@@ -309,11 +309,11 @@ export class Inicio implements AfterViewInit {
     this.ema200.setData(ema200Data);
 
     // Guardar últimos valores de EMA
-    this.ema3Anterior = ema3Data[ema3Data.length - 1];
-    this.ema9Anterior = ema9Data[ema9Data.length - 1];
-    this.ema20Anterior = ema20Data[ema20Data.length - 1];
-    this.ema50Anterior = ema50Data[ema50Data.length - 1];
-    this.ema200Anterior = ema200Data[ema200Data.length - 1];
+    this.ema3Anterior = ema3Data.at(-1)!;
+    this.ema9Anterior = ema9Data.at(-1)!;
+    this.ema20Anterior = ema20Data.at(-1)!;
+    this.ema50Anterior = ema50Data.at(-1)!;
+    this.ema200Anterior = ema200Data.at(-1)!;
 
     // Calcular y configurar Bandas de Bollinger
     const bollinger = calculateBollinger(velas);
@@ -324,7 +324,7 @@ export class Inicio implements AfterViewInit {
     // Configurar series de área
     const medianData = velas.map((v) => ({
       time: v.time,
-      value: (v.high + v.low) / 2,
+      value: v.medio,
     }));
 
     this.areaSeries.setData(medianData as any);
@@ -334,11 +334,12 @@ export class Inicio implements AfterViewInit {
     this.medio.setData(
       velas.map((v) => ({
         time: v.time,
-        value: (v.high + v.low) / 2,
+        value: v.medio,
       })) as any,
     );
 
     // Ajustar el rango visible
+    // TODO VERIFICAR
     // this.chart.timeScale().fitContent();
   }
 
@@ -368,7 +369,8 @@ export class Inicio implements AfterViewInit {
    */
   private handleStreamUpdate(candle: Candle): void {
     // Normalizar el tiempo según el timeframe
-    const normalizedTime = this.calculateNormalizedTime(candle.time);
+    const normalizedTime = candle.time;
+    // const normalizedTime = this.calculateNormalizedTime(candle.time);
 
     // Determinar si es una vela nueva
     const isNewCandle = normalizedTime > this.lastVela;
@@ -384,18 +386,18 @@ export class Inicio implements AfterViewInit {
       }
 
       // Guardar vela actual
-      this.currentCandle = { ...candle, time: normalizedTime };
+      this.currentCandle = candle;
     } else {
       // Actualizar vela existente
       if (this.currentCandle) {
         this.currentCandle = {
           ...this.currentCandle,
-          high: Math.max(this.currentCandle.high, candle.high),
-          low: Math.min(this.currentCandle.low, candle.low),
+          high: candle.high,
+          low: candle.low,
           close: candle.close,
         };
       } else {
-        this.currentCandle = { ...candle, time: normalizedTime };
+        this.currentCandle = candle;
       }
 
       // Actualizar última vela en buffer de Bollinger
@@ -403,20 +405,21 @@ export class Inicio implements AfterViewInit {
         const lastIndex = this.bollingerDataAnterior.length - 1;
         this.bollingerDataAnterior[lastIndex] = {
           ...this.bollingerDataAnterior[lastIndex],
-          high: Math.max(this.bollingerDataAnterior[lastIndex].high, candle.high),
-          low: Math.min(this.bollingerDataAnterior[lastIndex].low, candle.low),
+          high: candle.high,
+          low: candle.low,
           close: candle.close,
         };
       }
     }
 
     // Actualizar vela en el gráfico
+    // TODO VERIFICAR
     this.series.update({
       time: normalizedTime as UTCTimestamp,
-      open: isNewCandle ? candle.open : this.currentCandle!.open,
-      high: this.currentCandle!.high,
-      low: this.currentCandle!.low,
-      close: this.currentCandle!.close,
+      open: candle!.open,
+      high: candle!.high,
+      low: candle!.low,
+      close: candle!.close,
     });
 
     // Calcular y actualizar EMAs
@@ -502,9 +505,9 @@ export class Inicio implements AfterViewInit {
     if (this.bollingerDataAnterior.length < 20) return;
 
     const bollinger = calculateBollinger(this.bollingerDataAnterior);
-    const lastUpper = bollinger.upper[bollinger.upper.length - 1];
-    const lastMiddle = bollinger.middle[bollinger.middle.length - 1];
-    const lastLower = bollinger.lower[bollinger.lower.length - 1];
+    const lastUpper = bollinger.upper.at(-1);
+    const lastMiddle = bollinger.middle.at(-1);
+    const lastLower = bollinger.lower.at(-1);
 
     if (lastUpper && lastMiddle && lastLower) {
       this.bbUpper.update({ time: time as UTCTimestamp, value: lastUpper.value });
@@ -516,37 +519,37 @@ export class Inicio implements AfterViewInit {
   /**
    * Normaliza el timestamp según el timeframe seleccionado
    */
-  private calculateNormalizedTime(timestamp: number): number {
-    const year = new Date().getUTCFullYear();
-    const mes = new Date().getUTCMonth();
-    const intervalMap: Record<string, number> = {
-      // '1m': 60_000,
-      // '5m': 5 * 60_000,
-      // '15m': 15 * 60_000,
-      // '1h': 60 * 60_000,
-      // '2h': 2 * 60 * 60_000,
-      // '4h': 4 * 60 * 60_000,
-      // '1d': 24 * 60 * 60_000,
-      // '7d': 7 * 24 * 60 * 60_000,
-      // '1M': 30 * 24 * 60 * 60_000,
+  // private calculateNormalizedTime(timestamp: number): number {
+  //   const year = new Date().getUTCFullYear();
+  //   const mes = new Date().getUTCMonth();
+  //   const intervalMap: Record<string, number> = {
+  // '1m': 60_000,
+  // '5m': 5 * 60_000,
+  // '15m': 15 * 60_000,
+  // '1h': 60 * 60_000,
+  // '2h': 2 * 60 * 60_000,
+  // '4h': 4 * 60 * 60_000,
+  // '1d': 24 * 60 * 60_000,
+  // '7d': 7 * 24 * 60 * 60_000,
+  // '1M': 30 * 24 * 60 * 60_000,
 
-      '1m': 60_000,
-      '5m': 5 * 60_000,
-      '15m': 15 * 60_000,
-      '1h': 60 * 60_000,
-      '2h': 60 * 2 * 60_000,
-      '4h': 60 * 4 * 60_000,
-      '1d': 60 * 24 * 60_000,
-      '7d': 60 * 24 * 7 * 60_000,
-      // TODO cambiar
-      '1M': 60 * 24 * new Date(year, mes + 1, 0).getDate() * 60_000,
-    };
+  // '1m': 60_000,
+  // '5m': 5 * 60_000,
+  // '15m': 15 * 60_000,
+  // '1h': 60 * 60_000,
+  // '2h': 60 * 2 * 60_000,
+  // '4h': 60 * 4 * 60_000,
+  // '1d': 60 * 24 * 60_000,
+  // '7d': 60 * 24 * 7 * 60_000,
+  // TODO cambiar
+  //     '1M': 60 * 24 * new Date(year, mes + 1, 0).getDate() * 60_000,
+  //   };
 
-    const interval = intervalMap[this.time()] || 60_000;
+  //   const interval = intervalMap[this.time()] || 60_000;
 
-    // Normalizar al inicio del período
-    return Math.floor(timestamp / interval) * interval;
-  }
+  //   // Normalizar al inicio del período
+  //   return Math.floor(timestamp / interval) * interval;
+  // }
 
   /**
    * Cambia la temporalidad del gráfico
