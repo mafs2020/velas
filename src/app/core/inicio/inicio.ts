@@ -24,7 +24,7 @@ import {
 } from 'lightweight-charts';
 
 import { Candle, BinanceService } from './servicios/prueba';
-import { calculateEMA, calculateBollinger } from '../indicadores';
+import { calculateEMA, calculateBollinger, calculateParabolicSAR } from '../indicadores';
 import { rxResource } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -62,6 +62,8 @@ export class Inicio implements AfterViewInit {
   private bbLower!: ISeriesApi<'Line'>;
   private areaSeries!: ISeriesApi<'Area'>;
   private areaSeries200!: ISeriesApi<'Area'>;
+  sarBull!: ISeriesApi<'Line'>;
+  sarBear!: ISeriesApi<'Line'>;
 
   // Estado de velas e indicadores
   private ema3Anterior!: { time: Time; value: number };
@@ -276,6 +278,33 @@ export class Inicio implements AfterViewInit {
       title: 'BB Lower',
     });
 
+    this.sarBull = this.chart.addSeries(LineSeries, {
+      color: 'green', // ocultamos la línea
+      lineWidth: 1,
+      lineStyle: 4,
+      crosshairMarkerVisible: false,
+      lastValueVisible: false,
+      priceLineVisible: false,
+      title: 'sar bull',
+      pointMarkersVisible: true,
+    });
+    this.sarBear = this.chart.addSeries(LineSeries, {
+      color: 'red', // ocultamos la línea
+      lineWidth: 1,
+      lineStyle: 4,
+      crosshairMarkerVisible: false,
+      lastValueVisible: false,
+      priceLineVisible: true,
+      pointMarkersVisible: true,
+      title: 'sar bear',
+    });
+
+    //     const sarBear = chart.addLineSeries({
+    //   color: '#ff0000',
+    //   lineWidth: 0,
+    //   pointMarkersVisible: true,
+    // });
+
     // Iniciar stream después de inicializar el gráfico
     // setTimeout(() => this.reconnectStream(), 100);
   }
@@ -337,6 +366,21 @@ export class Inicio implements AfterViewInit {
         value: v.medio,
       })) as any,
     );
+
+    const sarData = calculateParabolicSAR(velas);
+
+    const bullData = sarData
+      .filter((p) => p.isBullish)
+      .map((p) => ({ time: p.time, value: p.value }));
+
+    const bearData = sarData
+      .filter((p) => !p.isBullish)
+      .map((p) => ({ time: p.time, value: p.value }));
+
+    this.sarBull.setData(bullData as any);
+    this.sarBear.setData(bearData as any);
+
+    // this.sarBull.setData()
 
     // Ajustar el rango visible
     // TODO VERIFICAR
