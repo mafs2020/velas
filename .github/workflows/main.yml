@@ -17,22 +17,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'pnpm'
 
-      - name: Activar Corepack (pnpm)
-        run: corepack enable
 
-      - name: Usar versión de pnpm
-        run: corepack prepare pnpm@latest --activate
 
-      - name: Instalar dependencias
-        run: pnpm install --frozen-lockfile
+
+
 
       - name: Build Angular
-        run: pnpm build
-
-      - name: Instalar Firebase CLI
-        run: npm install -g firebase-tools
-
-      - name: Deploy a Firebase
-        run: firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
+        run: npm build
