@@ -13,17 +13,18 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v6
 
-      - name: Setup Node
+      - name: instalando node
         uses: actions/setup-node@v6
         with:
           node-version: 20
-
-      - name: Instalar dependencias
-        run: npm i
-      - name: listar
+          
+      - name: listar con el comando ls
         run: ls -la
       - name: pwd
         run: pwd
 
+        - name: Instalar dependencias
+        run: npm i
+        
       - name: Build Angular
         run: npm run build
