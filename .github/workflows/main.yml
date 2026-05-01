@@ -18,6 +18,5 @@ jobs:
         with:
           node-version: 20
 
-
       - name: Build Angular
-        run: npm build
+        run: npm run build
