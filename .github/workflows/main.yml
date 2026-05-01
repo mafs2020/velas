@@ -1,4 +1,4 @@
-name: 1ero
+name: Angular CI/CD Firebase
 
 on:
   push:
@@ -6,23 +6,33 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: instalara node
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          cache: "pnpm"
+          node-version: 20
+          cache: 'pnpm'
 
-      - name: Instalar pnpm
-        run: npm install -g pnpm
+      - name: Activar Corepack (pnpm)
+        run: corepack enable
+
+      - name: Usar versión de pnpm
+        run: corepack prepare pnpm@latest --activate
 
       - name: Instalar dependencias
         run: pnpm install --frozen-lockfile
 
       - name: Build Angular
         run: pnpm build
+
+      - name: Instalar Firebase CLI
+        run: npm install -g firebase-tools
+
+      - name: Deploy a Firebase
+        run: firebase deploy --only hosting --token ${{ secrets.FIREBASE_TOKEN }}
