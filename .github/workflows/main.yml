@@ -13,7 +13,7 @@ jobs:
       - name: Checkout del código
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: instalara node
         uses: actions/setup-node@v4
         with:
           cache: "pnpm"
