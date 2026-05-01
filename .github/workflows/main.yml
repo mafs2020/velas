@@ -18,5 +18,8 @@ jobs:
         with:
           node-version: 20
 
+      - name: Instalar dependencias
+        run: npm ci
+
       - name: Build Angular
         run: npm run build
