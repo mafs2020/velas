@@ -1,4 +1,4 @@
-name: Angular CI/CD Firebase
+name: 1ero
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,10 +17,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-
-
-
-
 
 
       - name: Build Angular
