@@ -22,8 +22,7 @@ jobs:
         run: ls -la
       - name: pwd
         run: pwd
-
-        - name: Instalar dependencias
+      - name: Instalar dependencias
         run: npm i
         
       - name: Build Angular
