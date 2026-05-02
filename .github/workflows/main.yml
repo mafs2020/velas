@@ -36,6 +36,9 @@ jobs:
 
   publicar:
     needs: creacion
+    permissions:
+      contents: read
+      pages: write
     runs-on: ubuntu-latest
     environment:
       name: github-pages
