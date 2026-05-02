@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  trabajando:
+  creacion:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,13 +17,14 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20
-          
+          cache: 'pnpm'
+
       - name: listar con el comando ls
         run: ls -la
       - name: pwd
         run: pwd
       - name: Instalar dependencias
-        run: npm i
-        
+        run: pnpm i
+
       - name: Build Angular
-        run: npm run build
+        run: pnpm run build
