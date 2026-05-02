@@ -27,3 +27,21 @@ jobs:
 
       - name: Build Angular
         run: npm run build
+
+      - name: subiendo archivos a artifact
+        # id: deployment
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/velas/browser
+
+  publicar:
+    needs: creacion
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
