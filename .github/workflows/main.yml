@@ -17,14 +17,13 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 20
-          cache: 'pnpm'
 
       - name: listar con el comando ls
         run: ls -la
       - name: pwd
         run: pwd
       - name: Instalar dependencias
-        run: pnpm i
+        run: npm i
 
       - name: Build Angular
-        run: pnpm run build
+        run: npm run build
